@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coding Mentor Agent</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- marked for markdown rendering, highlight.js for code -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.3/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="brand">🎓 Coding Mentor Agent</div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-tab="chat">💬 Chat</button>
+      <button class="tab-btn" data-tab="review">🔍 Code Review</button>
+      <button class="tab-btn" data-tab="explain">📖 Explain</button>
+      <button class="tab-btn" data-tab="path">🗺️ Learning Path</button>
+      <button class="tab-btn" data-tab="quiz">🧠 Quiz</button>
+      <button class="tab-btn" data-tab="challenge">⚡ Challenge</button>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- ── CHAT TAB ── -->
+    <section id="tab-chat" class="tab-content active">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>💬 Chat with your Mentor</h2>
+          <button class="btn-ghost" id="resetChat">Reset</button>
+        </div>
+        <div class="chat-window" id="chatWindow">
+          <div class="chat-msg mentor">
+            <div class="avatar">🎓</div>
+            <div class="bubble">
+              <p>Hi! I'm your coding mentor. Ask me anything — concepts, code review, learning advice, or just about programming in general.</p>
+              <p class="hint">Try: <em>"Explain closures in JavaScript"</em> or <em>"Review this code for me"</em></p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" placeholder="Ask your mentor anything..." rows="2"></textarea>
+          <button class="btn-primary" id="sendChat">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CODE REVIEW TAB ── -->
+    <section id="tab-review" class="tab-content">
+      <div class="panel">
+        <h2>🔍 Code Review</h2>
+        <div class="form-row">
+          <label>Language
+            <select id="reviewLang">
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="go">Go</option>
+              <option value="rust">Rust</option>
+              <option value="sql">SQL</option>
+              <option value="bash">Bash</option>
+            </select>
+          </label>
+          <label>Your Level
+            <select id="reviewLevel">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+        </div>
+        <textarea id="reviewCode" placeholder="Paste your code here..." rows="14" class="code-input"></textarea>
+        <button class="btn-primary" id="runReview">Review My Code →</button>
+      </div>
+      <div class="result-panel" id="reviewResult"></div>
+    </section>
+
+    <!-- ── EXPLAIN TAB ── -->
+    <section id="tab-explain" class="tab-content">
+      <div class="panel">
+        <h2>📖 Explain a Concept</h2>
+        <div class="form-row">
+          <label class="flex-2">Concept
+            <input id="explainConcept" type="text" placeholder="e.g. closures, recursion, async/await, Big O notation" />
+          </label>
+          <label>Level
+            <select id="explainLevel">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+          <label>Language
+            <select id="explainLang">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="typescript">TypeScript</option>
+              <option value="java">Java</option>
+              <option value="go">Go</option>
+              <option value="rust">Rust</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn-primary" id="runExplain">Explain →</button>
+      </div>
+      <div class="result-panel" id="explainResult"></div>
+    </section>
+
+    <!-- ── LEARNING PATH TAB ── -->
+    <section id="tab-path" class="tab-content">
+      <div class="panel">
+        <h2>🗺️ Personalised Learning Path</h2>
+        <div class="form-col">
+          <label>Your Goal
+            <input id="pathGoal" type="text" placeholder="e.g. Become a full-stack developer, Learn machine learning" />
+          </label>
+          <label>Current Skills
+            <input id="pathSkills" type="text" placeholder="e.g. Basic HTML/CSS, some JavaScript" value="basic programming knowledge" />
+          </label>
+          <label>Available Timeframe
+            <input id="pathTime" type="text" placeholder="e.g. 3 months, 6 weeks" value="3 months" />
+          </label>
+        </div>
+        <button class="btn-primary" id="runPath">Generate Path →</button>
+      </div>
+      <div class="result-panel" id="pathResult"></div>
+    </section>
+
+    <!-- ── QUIZ TAB ── -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="panel">
+        <h2>🧠 Quiz Generator</h2>
+        <div class="form-row">
+          <label class="flex-2">Topic
+            <input id="quizTopic" type="text" placeholder="e.g. JavaScript promises, Python decorators, SQL joins" />
+          </label>
+          <label>Level
+            <select id="quizLevel">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+          <label>Questions
+            <input id="quizCount" type="number" value="5" min="1" max="20" />
+          </label>
+        </div>
+        <button class="btn-primary" id="runQuiz">Generate Quiz →</button>
+      </div>
+      <div class="result-panel" id="quizResult"></div>
+    </section>
+
+    <!-- ── CHALLENGE TAB ── -->
+    <section id="tab-challenge" class="tab-content">
+      <div class="panel">
+        <h2>⚡ Coding Challenge</h2>
+        <div class="form-row">
+          <label class="flex-2">Topic
+            <input id="challengeTopic" type="text" placeholder="e.g. recursion, binary search, REST API, sorting algorithms" />
+          </label>
+          <label>Level
+            <select id="challengeLevel">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </label>
+          <label>Language
+            <select id="challengeLang">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="typescript">TypeScript</option>
+              <option value="java">Java</option>
+              <option value="go">Go</option>
+              <option value="rust">Rust</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn-primary" id="runChallenge">Generate Challenge →</button>
+      </div>
+      <div class="result-panel" id="challengeResult"></div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

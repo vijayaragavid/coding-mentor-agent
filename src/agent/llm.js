@@ -56,14 +56,22 @@ export async function stream(systemPrompt, userPrompt, onChunk) {
 
 /**
  * Multi-turn conversation support.
+ * Separates the system message from the conversation history,
+ * as the AI SDK requires system prompt in its own field.
  * @param {Array<{role: string, content: string}>} messages
  * @returns {Promise<string>}
  */
 export async function chat(messages) {
   const groq = getClient();
+
+  // Split system message from conversation turns
+  const systemMsg = messages.find(m => m.role === 'system');
+  const conversationMsgs = messages.filter(m => m.role !== 'system');
+
   const { text } = await generateText({
     model: groq(config.model),
-    messages,
+    system: systemMsg?.content,
+    messages: conversationMsgs,
     maxTokens: 4096,
     temperature: 0.7,
   });

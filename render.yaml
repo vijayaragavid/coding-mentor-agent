@@ -2,14 +2,15 @@ services:
   - type: web
     name: coding-mentor-agent
     runtime: node
+    plan: free
     buildCommand: npm install
     startCommand: node src/server.js
     envVars:
       - key: GROQ_API_KEY
-        sync: false        # you paste this manually in Render dashboard
+        sync: false
       - key: GROQ_MODEL
         value: llama-3.3-70b-versatile
-      - key: PORT
-        value: 3000
       - key: NODE_ENV
         value: production
+      - key: LOG_LEVEL
+        value: info

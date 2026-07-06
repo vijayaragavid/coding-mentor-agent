@@ -6,7 +6,7 @@
   <title>Coding Mentor Agent</title>
   <link rel="stylesheet" href="style.css" />
   <!-- marked for markdown rendering, highlight.js for code -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/13.0.3/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
@@ -21,6 +21,7 @@
       <button class="tab-btn" data-tab="quiz">🧠 Quiz</button>
       <button class="tab-btn" data-tab="challenge">⚡ Challenge</button>
     </div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
   </nav>
 
   <main class="container">

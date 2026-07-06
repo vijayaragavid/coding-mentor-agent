@@ -461,3 +461,45 @@ textarea.code-input {
 .score-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .score-grade { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .score-breakdown { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ── Light Mode ──────────────────────────────── */
+body.light {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface2: #eef0f7;
+  --border: #d0d5e8;
+  --accent: #6c63ff;
+  --accent2: #00a884;
+  --text: #1a1d2e;
+  --text-muted: #5a6278;
+  --code-bg: #f0f2f8;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+body.light .md-content code { color: #c56000; }
+body.light .option-btn { background: #f8f9ff; }
+body.light .chat-msg.user .bubble { background: var(--accent); color: #fff; }
+body.light select option { background: var(--surface); color: var(--text); }
+body.light .score-circle { background: rgba(255,255,255,0.6); }
+
+/* Smooth theme transition */
+body, .navbar, .panel, .result-panel, .bubble, .option-btn,
+input, select, textarea, .quiz-question, .tab-btn {
+  transition: background 0.25s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ── Theme Toggle Button ─────────────────────── */
+.theme-toggle {
+  margin-left: auto;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); transform: scale(1.05); }

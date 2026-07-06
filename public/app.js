@@ -3,6 +3,35 @@
 // Configure marked
 marked.setOptions({ breaks: true, gfm: true });
 
+// ── Dark / Light Mode Toggle ──────────────────
+const themeToggle = document.getElementById('themeToggle');
+const hljsTheme = document.getElementById('hljs-theme');
+const DARK_HLJS  = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+const LIGHT_HLJS = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+
+function applyTheme(mode) {
+  if (mode === 'light') {
+    document.body.classList.add('light');
+    themeToggle.textContent = '☀️';
+    hljsTheme.href = LIGHT_HLJS;
+  } else {
+    document.body.classList.remove('light');
+    themeToggle.textContent = '🌙';
+    hljsTheme.href = DARK_HLJS;
+  }
+}
+
+// Load saved preference, default dark
+const savedTheme = localStorage.getItem('theme') || 'dark';
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const isLight = document.body.classList.contains('light');
+  const next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  localStorage.setItem('theme', next);
+});
+
 // ── Tab switching ─────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {

@@ -113,24 +113,154 @@ document.getElementById('runPath').addEventListener('click', async () => {
 });
 
 // ── Quiz ──────────────────────────────────────
+let quizState = { questions: [], userAnswers: [], submitted: false };
+
 document.getElementById('runQuiz').addEventListener('click', async () => {
   const btn = document.getElementById('runQuiz');
   const result = document.getElementById('quizResult');
   const topic = document.getElementById('quizTopic').value.trim();
   if (!topic) { showError(result, 'Please enter a quiz topic.'); return; }
 
-  disableBtn(btn);
-  showLoading(result, 'Generating quiz...');
+  disableBtn(btn, 'Generating...');
+  showLoading(result, 'Building your quiz...');
+
   try {
-    const md = await callAPI('/api/quiz', {
-      topic,
-      level: document.getElementById('quizLevel').value,
-      count: parseInt(document.getElementById('quizCount').value) || 5,
+    const res = await fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topic,
+        level: document.getElementById('quizLevel').value,
+        count: parseInt(document.getElementById('quizCount').value) || 5,
+      }),
     });
-    renderMarkdown(result, md);
-  } catch (e) { showError(result, e.message); }
-  finally { enableBtn(btn); }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+
+    quizState = { questions: data.questions, userAnswers: new Array(data.questions.length).fill(null), submitted: false };
+    renderQuiz(result, topic);
+  } catch (e) {
+    showError(result, e.message);
+  } finally {
+    enableBtn(btn);
+  }
 });
+
+function renderQuiz(container, topic) {
+  const { questions } = quizState;
+  const letters = ['A', 'B', 'C', 'D'];
+
+  let html = `<div class="quiz-wrapper">
+    <div class="quiz-header">
+      <span class="quiz-title">🧠 ${topic} Quiz</span>
+      <span class="quiz-count">${questions.length} Questions</span>
+    </div>
+    <div class="quiz-questions">`;
+
+  questions.forEach((q, qi) => {
+    html += `<div class="quiz-question" id="qq-${qi}">
+      <div class="question-text"><span class="q-num">Q${qi + 1}.</span> ${escapeHtml(q.question)}</div>
+      <div class="options-grid">`;
+    q.options.forEach((opt, oi) => {
+      html += `<button class="option-btn" data-qi="${qi}" data-oi="${oi}" onclick="selectOption(${qi},${oi})">
+        <span class="opt-letter">${letters[oi]}</span>
+        <span class="opt-text">${escapeHtml(opt)}</span>
+      </button>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `</div>
+    <div class="quiz-footer">
+      <div class="quiz-progress" id="quizProgress">0 / ${questions.length} answered</div>
+      <button class="btn-primary" id="submitQuizBtn" onclick="submitQuiz()" disabled>Submit Quiz →</button>
+    </div>
+  </div>`;
+
+  container.innerHTML = html;
+  container.classList.add('visible');
+  container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+window.selectOption = function(qi, oi) {
+  if (quizState.submitted) return;
+  quizState.userAnswers[qi] = oi;
+
+  // Update option button styles for this question
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  const chosen = document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`);
+  if (chosen) chosen.classList.add('selected');
+
+  // Update progress
+  const answered = quizState.userAnswers.filter(a => a !== null).length;
+  const prog = document.getElementById('quizProgress');
+  if (prog) prog.textContent = `${answered} / ${quizState.questions.length} answered`;
+
+  // Enable submit when all answered
+  const submitBtn = document.getElementById('submitQuizBtn');
+  if (submitBtn) submitBtn.disabled = answered < quizState.questions.length;
+};
+
+window.submitQuiz = function() {
+  quizState.submitted = true;
+  const { questions, userAnswers } = quizState;
+  const letters = ['A', 'B', 'C', 'D'];
+
+  let correct = 0;
+
+  questions.forEach((q, qi) => {
+    const userAns = userAnswers[qi];
+    const isCorrect = userAns === q.answer;
+    if (isCorrect) correct++;
+
+    const qEl = document.getElementById(`qq-${qi}`);
+    if (!qEl) return;
+
+    // Style each option
+    qEl.querySelectorAll('.option-btn').forEach(btn => {
+      const oi = parseInt(btn.dataset.oi);
+      btn.disabled = true;
+      if (oi === q.answer) {
+        btn.classList.add('correct');
+      } else if (oi === userAns && !isCorrect) {
+        btn.classList.add('wrong');
+      }
+    });
+
+    // Add explanation
+    const expEl = document.createElement('div');
+    expEl.className = `quiz-explanation ${isCorrect ? 'exp-correct' : 'exp-wrong'}`;
+    expEl.innerHTML = `<span>${isCorrect ? '✅ Correct!' : `❌ Wrong — correct answer: <strong>${letters[q.answer]}) ${escapeHtml(q.options[q.answer])}</strong>`}</span>
+      <p>${escapeHtml(q.explanation)}</p>`;
+    qEl.appendChild(expEl);
+  });
+
+  // Score summary
+  const pct = Math.round((correct / questions.length) * 100);
+  const grade = pct >= 90 ? '🏆 Excellent!' : pct >= 70 ? '👍 Good job!' : pct >= 50 ? '📚 Keep practicing!' : '💪 Keep going!';
+  const scoreColor = pct >= 70 ? '#00d4aa' : pct >= 50 ? '#f0a500' : '#ff6b6b';
+
+  const footer = document.querySelector('.quiz-footer');
+  if (footer) {
+    footer.innerHTML = `<div class="score-card">
+      <div class="score-circle" style="--score-color:${scoreColor}">
+        <span class="score-pct">${pct}%</span>
+        <span class="score-label">Score</span>
+      </div>
+      <div class="score-details">
+        <div class="score-grade">${grade}</div>
+        <div class="score-breakdown">${correct} correct out of ${questions.length} questions</div>
+        <button class="btn-primary" style="margin-top:12px" onclick="document.getElementById('runQuiz').click()">Try Again →</button>
+      </div>
+    </div>`;
+  }
+};
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 // ── Challenge ─────────────────────────────────
 document.getElementById('runChallenge').addEventListener('click', async () => {

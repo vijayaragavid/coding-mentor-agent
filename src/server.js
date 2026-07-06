@@ -76,8 +76,8 @@ app.post('/api/quiz', async (req, res) => {
   try {
     const { topic, level = 'intermediate', count = 5 } = req.body;
     if (!topic) return res.status(400).json({ error: 'topic is required' });
-    const result = await generateQuiz({ topic, level, count });
-    res.json({ result });
+    const questions = await generateQuiz({ topic, level, count });
+    res.json({ questions });
   } catch (err) { handleError(res, err); }
 });
 

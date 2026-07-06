@@ -98,29 +98,27 @@ Practical advice for staying on track.
 `;
 
 export const QUIZ_PROMPT = (topic, level, count) => `
-Generate ${count} coding quiz questions on the topic: "${topic}" for a ${level} developer.
+Generate ${count} multiple-choice quiz questions on the topic: "${topic}" for a ${level} developer.
 
-Format each question exactly as:
+You MUST respond with ONLY a valid JSON array. No markdown, no explanation, no code fences — just raw JSON.
 
----
-**Question N**: [question text]
+The JSON must follow this exact structure:
+[
+  {
+    "question": "What does X do?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": 1,
+    "explanation": "Option B is correct because..."
+  }
+]
 
-**Type**: [multiple-choice | code-output | fill-in-the-blank | debug-the-code]
-
-**Options** (if multiple choice):
-A) ...
-B) ...
-C) ...
-D) ...
-
-**Answer**: [correct answer or letter]
-
-**Explanation**: [why this is correct and what the learner should understand]
-
-**Difficulty**: [easy | medium | hard]
----
-
-Make questions progressively harder. Include at least one "debug-the-code" question.
+Rules:
+- "options" must always have exactly 4 items (A, B, C, D)
+- "answer" is the 0-based index of the correct option (0=A, 1=B, 2=C, 3=D)
+- "explanation" explains why the correct answer is right
+- Make questions progressively harder
+- All ${count} questions must be about: "${topic}"
+- Return ONLY the JSON array, nothing else
 `;
 
 export const CHALLENGE_PROMPT = (topic, level, language) => `
